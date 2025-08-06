@@ -17,6 +17,7 @@ const addTask = () => {
             let taskCell = document.createElement("td");
             let task = document.createElement('p');
             task.textContent = `${targetInput.value}`;
+            targetInput.value = ''; // clear the input field
             taskCell.appendChild(task);
             checkboxEvent(doneCell, task);
             // taskCell.innerHTML = `<p class="task">${targetInput.value}</p>`;
