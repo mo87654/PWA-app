@@ -1,0 +1,49 @@
+body {
+  text-align: center;
+}
+.container {
+  max-width: 1000px;
+  text-align: center;
+  align-items: center;
+  margin: auto;
+}
+
+#textField {
+  padding: 10px;
+  margin-bottom: 30px;
+  margin-right: 20px;
+  width: 70%;
+  border: none;
+  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.5);
+}
+#button {
+  padding: 10px 30px;
+  color: white;
+  background-color: rgb(81, 81, 250);
+  border: none;
+  border-radius: 10px;
+  font-size: 18px;
+}
+
+table {
+  width: 100%;
+  text-align: center;
+}
+
+th {
+  background-color: rgb(181, 0, 0);
+  color: white;
+}
+td tr {
+  padding: 0;
+}
+table button {
+  color: white;
+  background-color: rgb(246, 72, 72);
+  border: none;
+  border-radius: 6px;
+  padding: 8px;
+}
+p {
+  margin: 0;
+}
