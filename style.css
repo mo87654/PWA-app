@@ -48,12 +48,15 @@ p {
   margin: 0;
 }
 
-/* Offline message styling */
-.offline {
-  display: none;
-  background-color: orange;
+/* Offline banner */
+#offline-banner {
+  background-color: #ff4d4d;
   color: white;
+  text-align: center;
   padding: 10px;
-  margin-top: 10px;
-  border-radius: 8px;
+  font-weight: bold;
+}
+
+.hidden {
+  display: none;
 }

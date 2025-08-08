@@ -8,34 +8,37 @@ const addTask = () => {
     targetButton.addEventListener('click', function () {
         count += 1;
         if (targetInput.value.trim() != '') {
-            let row = document.createElement("tr");
-            if (count % 2 == 0) {
-                row.style.backgroundColor = 'rgb(211, 211, 211)';
-            }
-            let doneCell = document.createElement("td");
-            let taskCell = document.createElement("td");
-            let task = document.createElement('p');
-            task.textContent = `${targetInput.value}`;
+            createRow(targetInput.value, targetTable);
             targetInput.value = '';
-            taskCell.appendChild(task);
-            checkboxEvent(doneCell, task);
-            let deleteCell = document.createElement("td");
-            buttonEvent(deleteCell);
-            row.append(doneCell, taskCell, deleteCell);
-            targetTable.appendChild(row);
-        } else {
-            console.log('false');
         }
     });
 };
+
+// Create table row
+function createRow(taskText, targetTable) {
+    let row = document.createElement("tr");
+    if (count % 2 == 0) row.style.backgroundColor = 'rgb(211, 211, 211)';
+
+    let doneCell = document.createElement("td");
+    let taskCell = document.createElement("td");
+    let task = document.createElement('p');
+    task.textContent = taskText;
+    taskCell.appendChild(task);
+    checkboxEvent(doneCell, task);
+
+    let deleteCell = document.createElement("td");
+    buttonEvent(deleteCell);
+
+    row.append(doneCell, taskCell, deleteCell);
+    targetTable.appendChild(row);
+}
 
 const buttonEvent = (deleteCell) => {
     let but = document.createElement('button');
     but.textContent = 'Delete';
     deleteCell.appendChild(but);
     but.addEventListener('click', function () {
-        let response = confirm('Are you sure to delete this task?');
-        if (response) {
+        if (confirm('Are you sure to delete this task?')) {
             this.parentElement.parentElement.remove();
         }
     });
@@ -46,40 +49,33 @@ const checkboxEvent = (doneCell, task) => {
     check.type = 'checkbox';
     doneCell.appendChild(check);
     check.addEventListener('change', function () {
-        if (this.checked) {
-            task.style.textDecoration = 'line-through';
-        } else {
-            task.style.textDecoration = 'none';
-        }
+        task.style.textDecoration = this.checked ? 'line-through' : 'none';
     });
 };
 
-// API fetch example
-const fetchData = async () => {
-    try {
-        let res = await fetch('https://jsonplaceholder.typicode.com/todos/1');
-        let data = await res.json();
-        console.log('Fetched API Data:', data);
-    } catch (error) {
-        console.log('Fetch failed (offline?):', error);
-    }
-};
-
-// Show/hide offline message
-const offlineMessage = document.getElementById('offline-message');
-window.addEventListener('online', () => offlineMessage.style.display = 'none');
-window.addEventListener('offline', () => offlineMessage.style.display = 'block');
-
-// Register service worker
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js')
-            .then(reg => console.log('Service Worker registered:', reg))
-            .catch(err => console.log('Service Worker registration failed:', err));
-    });
+// Fetch API Data
+function fetchAPIData() {
+    fetch("https://jsonplaceholder.typicode.com/todos?_limit=5")
+        .then(res => res.json())
+        .then(data => {
+            let table = document.querySelector("table");
+            data.forEach(item => createRow(item.title, table));
+        })
+        .catch(() => console.log("Failed to fetch API data"));
 }
+
+// Show connection lost message
+window.addEventListener("offline", () => {
+    alert("⚠ Connection lost! You are now offline.");
+});
 
 window.addEventListener('load', () => {
     addTask();
-    fetchData();
+    fetchAPIData();
+
+    // Register service worker
+    if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("./service-worker.js")
+            .then(() => console.log("Service Worker registered"));
+    }
 });

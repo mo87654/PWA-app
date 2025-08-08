@@ -8,7 +8,6 @@
 
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#5151fa" />
-
   <link rel="icon" href="icons/icon-192.png" />
 
   <link rel="stylesheet" href="style.css" />
@@ -16,27 +15,29 @@
 </head>
 
 <body>
-    <div class="container">
-        <h1>To Do Organizer</h1>
-        <div>
-            <input type="text" name="task" id="textField" class="row" placeholder="Enter Task Name">
-            <input type="button" name="btn" id="button" class="row" value="Add">
-        </div>
-        <div>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Done</th>
-                        <th>Task</th>
-                        <th>Delete</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-        </div>
-        <div id="offline-message" class="offline">⚠ You are offline. Some features may not be available.</div>
+  <!-- Connection status banner -->
+  <div id="offline-banner" class="hidden">⚠ You are offline</div>
+
+  <div class="container">
+    <h1>To Do Organizer</h1>
+    <div>
+      <input type="text" name="task" id="textField" class="row" placeholder="Enter Task Name">
+      <input type="button" name="btn" id="button" class="row" value="Add">
     </div>
+    <div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Done</th>
+            <th>Task</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </body>
 
 </html>
