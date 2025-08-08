@@ -1,4 +1,4 @@
-const CACHE_NAME = "todo-cache-v2";
+const CACHE_NAME = "todo-cache-v3";
 const API_URL = "https://jsonplaceholder.typicode.com/todos?_limit=5";
 
 const ASSETS = [
@@ -11,17 +11,15 @@ const ASSETS = [
   "./icons/icon-512.png"
 ];
 
-// Install event: cache app shell
+// Install event
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
-      return cache.addAll(ASSETS);
-    })
+    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
   );
   self.skipWaiting();
 });
 
-// Activate event: cleanup old caches
+// Activate event
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -31,23 +29,21 @@ self.addEventListener("activate", event => {
   self.clients.claim();
 });
 
-// Fetch event: try network first for API, then fallback to cache
+// Fetch event
 self.addEventListener("fetch", event => {
   if (event.request.url.includes(API_URL.split("?")[0])) {
     event.respondWith(
       fetch(event.request)
         .then(response => {
-          // Cache API response
           const resClone = response.clone();
           caches.open(CACHE_NAME).then(cache => {
             cache.put(event.request, resClone);
           });
           return response;
         })
-        .catch(() => caches.match(event.request)) // fallback to cache
+        .catch(() => caches.match(event.request))
     );
   } else {
-    // App shell strategy: Cache first, then network
     event.respondWith(
       caches.match(event.request).then(cached => cached || fetch(event.request))
     );

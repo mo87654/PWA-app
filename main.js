@@ -60,13 +60,20 @@ function fetchAPIData() {
         .then(data => {
             let table = document.querySelector("table");
             data.forEach(item => createRow(item.title, table));
+            console.log("Fetched API Data:", data[0]); // Log first item for confirmation
         })
         .catch(() => console.log("Failed to fetch API data"));
 }
 
-// Show connection lost message
+// Handle online/offline UI
+const offlineBanner = document.getElementById("offline-banner");
+
 window.addEventListener("offline", () => {
-    alert("⚠ Connection lost! You are now offline.");
+    offlineBanner.classList.remove("hidden");
+});
+
+window.addEventListener("online", () => {
+    offlineBanner.classList.add("hidden");
 });
 
 window.addEventListener('load', () => {

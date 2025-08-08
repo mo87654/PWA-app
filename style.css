@@ -50,13 +50,20 @@ p {
 
 /* Offline banner */
 #offline-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
   background-color: #ff4d4d;
   color: white;
   text-align: center;
   padding: 10px;
   font-weight: bold;
+  z-index: 1000;
+  box-shadow: 0px 2px 8px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease-in-out;
 }
 
 .hidden {
-  display: none;
+  transform: translateY(-100%);
 }
