@@ -1,6 +1,4 @@
-const CACHE_NAME = "todo-pwa-v2"; // bump version on updates
-const API_URL = "https://jsonplaceholder.typicode.com/todos/1";
-
+const CACHE_NAME = "todo-cache-v1";
 const ASSETS = [
     "./",
     "./index.html",
@@ -11,53 +9,43 @@ const ASSETS = [
     "./icons/icon-512.png"
 ];
 
-// Install event
+// Install and cache assets
 self.addEventListener("install", event => {
     event.waitUntil(
         caches.open(CACHE_NAME).then(cache => {
-            console.log("Caching app shell");
             return cache.addAll(ASSETS);
         })
     );
     self.skipWaiting();
 });
 
-// Activate event
+// Activate and clean old caches
 self.addEventListener("activate", event => {
     event.waitUntil(
         caches.keys().then(keys => {
             return Promise.all(
-                keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
+                keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
             );
         })
     );
     self.clients.claim();
 });
 
-// Fetch event
+// Fetch handler
 self.addEventListener("fetch", event => {
-    if (event.request.url.includes(API_URL)) {
-        event.respondWith(
-            fetch(event.request)
-                .then(response => {
-                    const clone = response.clone();
-                    caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-                    return response;
-                })
-                .catch(() => caches.match(event.request))
-        );
-    } else {
-        event.respondWith(
-            caches.match(event.request).then(cached => {
-                return cached || fetch(event.request);
+    event.respondWith(
+        fetch(event.request)
+            .then(response => {
+                // Cache the new version
+                let resClone = response.clone();
+                caches.open(CACHE_NAME).then(cache => {
+                    cache.put(event.request, resClone);
+                });
+                return response;
             })
-        );
-    }
-});
-
-// Listen for skipWaiting
-self.addEventListener("message", event => {
-    if (event.data.action === "skipWaiting") {
-        self.skipWaiting();
-    }
+            .catch(() => {
+                // Return cache if offline
+                return caches.match(event.request);
+            })
+    );
 });
