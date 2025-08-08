@@ -47,3 +47,16 @@ table button {
 p {
   margin: 0;
 }
+
+/* Offline banner */
+#offline-banner {
+  background-color: #ff4d4d;
+  color: white;
+  text-align: center;
+  padding: 10px;
+  font-weight: bold;
+}
+
+.hidden {
+  display: none;
+}
