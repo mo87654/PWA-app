@@ -4,27 +4,28 @@ const addTask = () => {
     let targetInput = document.querySelector('#textField');
     let targetButton = document.querySelector('#button');
     let targetTable = document.querySelector('table');
-    
+
     targetButton.addEventListener('click', function () {
         count += 1;
-        if (targetInput.value.trim() != '') {
+        if (targetInput.value.trim() !== '') {
             let row = document.createElement("tr");
-            if (count % 2 == 0) {
+            if (count % 2 === 0) {
                 row.style.backgroundColor = 'rgb(211, 211, 211)';
             }
+
             let doneCell = document.createElement("td");
             let taskCell = document.createElement("td");
             let task = document.createElement('p');
             task.textContent = `${targetInput.value}`;
-            targetInput.value = ''; // clear input
+            targetInput.value = '';
             taskCell.appendChild(task);
             checkboxEvent(doneCell, task);
+
             let deleteCell = document.createElement("td");
             buttonEvent(deleteCell);
+
             row.append(doneCell, taskCell, deleteCell);
             targetTable.appendChild(row);
-        } else {
-            console.log('false');
         }
     });
 };
@@ -46,59 +47,60 @@ const checkboxEvent = (doneCell, task) => {
     check.type = 'checkbox';
     doneCell.appendChild(check);
     check.addEventListener('change', function () {
-        task.style.textDecoration = this.checked ? 'line-through' : 'none';
+        if (this.checked) {
+            task.style.textDecoration = 'line-through';
+        } else {
+            task.style.textDecoration = 'none';
+        }
     });
 };
 
-async function fetchData() {
-    const url = 'https://jsonplaceholder.typicode.com/todos/1';
-    try {
-        const response = await fetch(url);
-        const data = await response.json();
-        console.log("Fetched API Data:", data);
-        localStorage.setItem('apiData', JSON.stringify(data));
-    } catch (error) {
-        console.log("Offline: Showing cached data");
-        const cached = localStorage.getItem('apiData');
-        if (cached) {
-            console.log("Cached API Data:", JSON.parse(cached));
-        }
-    }
-}
-
-window.addEventListener('offline', () => {
-    alert("Connection lost. You are now offline.");
-});
-
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js')
-            .then(registration => {
-                console.log('Service Worker registered:', registration);
-
-                registration.addEventListener('updatefound', () => {
-                    const newWorker = registration.installing;
-                    newWorker.addEventListener('statechange', () => {
-                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            console.log("New version available, refreshing...");
-                            newWorker.postMessage({ action: 'skipWaiting' });
-                        }
-                    });
-                });
-            })
-            .catch(err => console.log('SW registration failed:', err));
-    });
-
-    let refreshing;
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!refreshing) {
-            window.location.reload();
-            refreshing = true;
-        }
-    });
-}
-
 window.addEventListener('load', () => {
     addTask();
-    fetchData();
+
+    // Fetch data from API
+    fetch('https://jsonplaceholder.typicode.com/todos/1')
+        .then(response => response.json())
+        .then(data => {
+            console.log("Fetched API Data:", data);
+        })
+        .catch(() => {
+            showOfflineMessage();
+        });
 });
+
+// Show offline message
+function showOfflineMessage() {
+    const msg = document.createElement('div');
+    msg.textContent = '⚠ Connection lost. You are viewing offline content.';
+    msg.style.background = 'orange';
+    msg.style.color = 'white';
+    msg.style.padding = '10px';
+    msg.style.position = 'fixed';
+    msg.style.top = '0';
+    msg.style.left = '0';
+    msg.style.width = '100%';
+    msg.style.textAlign = 'center';
+    document.body.appendChild(msg);
+}
+
+// Service Worker registration with auto-update
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./service-worker.js').then(registration => {
+        console.log("Service Worker registered:", registration);
+
+        if (registration.waiting) {
+            registration.waiting.postMessage({ action: "skipWaiting" });
+        }
+
+        registration.addEventListener("updatefound", () => {
+            const newWorker = registration.installing;
+            newWorker.addEventListener("statechange", () => {
+                if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+                    console.log("New version available, refreshing...");
+                    window.location.reload();
+                }
+            });
+        });
+    });
+}
